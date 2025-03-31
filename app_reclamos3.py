@@ -35,9 +35,6 @@ if uploaded_file:
         df['FECHA SINIESTRO'] = pd.to_datetime(df['FECHA SINIESTRO'], errors='coerce')
         df['FECHA NOTIFICACION SINIESTRO'] = pd.to_datetime(df['FECHA NOTIFICACION SINIESTRO'], errors='coerce')
         
-        liquidados = df[df['ESTADO'] == 'LIQUIDADO']
-        pendientes = df[df['ESTADO'] == 'PENDIENTE']
-        
         
         # Sidebar controls
         with st.sidebar:
@@ -49,16 +46,14 @@ if uploaded_file:
             producto = ['Todas'] + sorted(df['BASE'].unique().tolist())
             producto_sel = st.selectbox("Seleccionar Producto", producto)
 
-            # Filtrar datos
-            df_filtrado = df.copy()
-            if producto_sel != 'Todas':
-                df = df_filtrado[df_filtrado['BASE'] == producto_sel]
-        
         liquidados = df[df['ESTADO'] == 'LIQUIDADO']
+      
         pendientes = df[df['ESTADO'] == 'PENDIENTE']
         # Filtrar datos por año
         liquidados_filtrados = liquidados[liquidados['FECHA SINIESTRO'].dt.year == año_analisis]
         pendientes_filtrados = pendientes[pendientes['FECHA SINIESTRO'].dt.year == año_analisis]
+        if df_filtrado.empty:
+            st.warning(f"🚨 No se encontraron registros para {producto_sel if producto_sel != 'Todas' else 'ningún producto'} en {año_analisis}")
         
         # Análisis temporal
         st.header("📅 Distribución Temporal de Reclamos")
