@@ -69,7 +69,7 @@ if uploaded_file:
             # Métricas resumen
             col1, col2, col3 = st.columns(3)
             liquidados_filtrados['TIEMPO_RESPUESTA'] = (liquidados_filtrados['FECHA NOTIFICACION SINIESTRO'] - liquidados_filtrados['FECHA SINIESTRO']).dt.days
-            tiempo_promedio = df['TIEMPO_RESPUESTA'].mean()
+            tiempo_promedio = liquidados_filtrados['TIEMPO_RESPUESTA'].mean()
             with col1:
                 st.metric("Total Reclamos Liquidados", f"{len(liquidados_filtrados):,}")
                 st.metric(
