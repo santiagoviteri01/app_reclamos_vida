@@ -44,6 +44,9 @@ if uploaded_file:
                             # Filtros principales
             producto = ['Todas'] + sorted(df['BASE'].unique().tolist())
             producto_sel = st.selectbox("Seleccionar Producto", producto)
+             df_filtrado = df.copy()
+            if producto_sel != 'Todas':
+                df = df_filtrado[df_filtrado['BASE'] == producto_sel]
 
         liquidados = df[df['ESTADO'] == 'LIQUIDADO']
       
