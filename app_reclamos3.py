@@ -58,6 +58,8 @@ if uploaded_file:
         if not liquidados_filtrados.empty:
             # Gráfico de reclamos por mes
             fig, ax = plt.subplots(figsize=(10, 4))
+            liquidados_filtrados['MES'] = liquidados_filtrados['FECHA SINIESTRO'].dt.month
+            liquidados_filtrados['MES'] = pd.Categorical(liquidados_filtrados['MES'], ordered=True)
             liquidados_filtrados['MES'].value_counts().sort_index().plot(kind='bar', color='teal', ax=ax)
             plt.title('Reclamos Liquidados por Mes')
             plt.xlabel('Mes')
