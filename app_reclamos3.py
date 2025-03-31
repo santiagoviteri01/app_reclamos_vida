@@ -56,8 +56,6 @@ if uploaded_file:
         st.header("📅 Distribución Temporal de Reclamos")
 
          if not liquidados_filtrados.empty:
-            liquidados_filtrados['MES'] = liquidados_filtrados['FECHA SINIESTRO'].dt.month
-            liquidados_filtrados['MES'] = pd.Categorical(liquidados_filtrados['MES'], ordered=True)
             # Gráfico de reclamos por mes
             fig, ax = plt.subplots(figsize=(10, 4))
             liquidados_filtrados['MES'].value_counts().sort_index().plot(kind='bar', color='teal', ax=ax)
@@ -68,7 +66,7 @@ if uploaded_file:
             
             # Métricas resumen
             col1, col2, col3 = st.columns(3)
-            df['TIEMPO_RESPUESTA'] = (df['FECHA NOTIFICACION SINIESTRO'] - df['FECHA SINIESTRO']).dt.days
+            liquidados_filtrados['TIEMPO_RESPUESTA'] = (liquidados_filtrados['FECHA NOTIFICACION SINIESTRO'] - liquidados_filtrados['FECHA SINIESTRO']).dt.days
             tiempo_promedio = df['TIEMPO_RESPUESTA'].mean()
             with col1:
                 st.metric("Total Reclamos Liquidados", f"{len(liquidados_filtrados):,}")
@@ -80,8 +78,6 @@ if uploaded_file:
             with col2:
                 st.metric("Valor Total Liquidado", f"${liquidados_filtrados['VALOR ASEGURADO'].sum():,.2f}")
                 st.metric("Edad Promedio de Fallecimiendo", f"{df['EDAD'].mean():,.2f}")
-            with col3:
-                st.metric("Reclamos Pendientes", f"{len(pendientes_filtrados):,}")
             
             # Análisis de valores
             st.header("💰 Análisis de Valores Asegurados")
@@ -130,15 +126,15 @@ if uploaded_file:
                 '65-70', '70-75', '75-80', '80-85', '85+'
             ]
             
-            df['GRUPO_EDAD'] = pd.cut(
-                df['EDAD'],
+            liquidados_filtrados['GRUPO_EDAD'] = pd.cut(
+                liquidados_filtrados['EDAD'],
                 bins=bins,
                 labels=labels,
                 right=False
             )
             
             # Calcular distribución
-            distribucion_edades = df['GRUPO_EDAD'].value_counts().sort_index()
+            distribucion_edades = liquidados_filtrados['GRUPO_EDAD'].value_counts().sort_index()
             
             # Gráfico
             fig, ax = plt.subplots(figsize=(12, 6))
@@ -184,6 +180,7 @@ if uploaded_file:
             col6, col7 = st.columns(2)
             
             with col6:
+              
                 # Distribución de causas pendientes
                 fig = plt.figure(figsize=(10, 5))
                 sns.countplot(y='CAUSA SINIESTRO', data=pendientes_filtrados)
