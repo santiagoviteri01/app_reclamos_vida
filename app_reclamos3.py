@@ -55,7 +55,7 @@ if uploaded_file:
         # Análisis temporal
         st.header("📅 Distribución Temporal de Reclamos")
 
-         if not liquidados_filtrados.empty:
+        if not liquidados_filtrados.empty:
             # Gráfico de reclamos por mes
             fig, ax = plt.subplots(figsize=(10, 4))
             liquidados_filtrados['MES'].value_counts().sort_index().plot(kind='bar', color='teal', ax=ax)
