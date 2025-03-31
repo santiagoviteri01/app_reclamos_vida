@@ -70,7 +70,7 @@ if uploaded_file:
             st.pyplot(fig)
             
             # Métricas resumen
-            col1, col2, col3 = st.columns(3)
+            col1, col2 = st.columns(2)
             liquidados_filtrados['TIEMPO_RESPUESTA'] = (liquidados_filtrados['FECHA NOTIFICACION SINIESTRO'] - liquidados_filtrados['FECHA SINIESTRO']).dt.days
             tiempo_promedio = liquidados_filtrados['TIEMPO_RESPUESTA'].mean()
             with col1:
