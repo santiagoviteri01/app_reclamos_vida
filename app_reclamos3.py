@@ -176,7 +176,7 @@ if uploaded_file:
                     use_container_width=True
                 )
         else:
-            st.info("No hay reclamos pendientes para el año seleccionado")
+            st.info("No hay reclamos liquidados para el año seleccionado")
 
         # Análisis de pendientes
         st.header("⏳ Reclamos Pendientes")
