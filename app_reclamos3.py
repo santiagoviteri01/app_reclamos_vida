@@ -64,7 +64,7 @@ if uploaded_file:
         st.header("📅 Distribución Temporal de Reclamos")
         
         # Procesamiento de meses
-        liquidados_filtrados['MES'] = liquidados_filtrados['FECHA SINIESTRO'].dt.month_name()
+        liquidados_filtrados['MES'] = liquidados_filtrados['FECHA SINIESTRO'].dt.month
         liquidados_filtrados['MES'] = pd.Categorical(liquidados_filtrados['MES'], ordered=True)
         
         # Gráfico de reclamos por mes
