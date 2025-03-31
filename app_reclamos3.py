@@ -54,7 +54,7 @@ if uploaded_file:
         # Filtrar datos por año
         liquidados_filtrados = liquidados[liquidados['FECHA SINIESTRO'].dt.year == año_analisis]
         pendientes_filtrados = pendientes[pendientes['FECHA SINIESTRO'].dt.year == año_analisis]
-        
+        df2=df[df['FECHA SINIESTRO'].dt.year == año_analisis]
         # Análisis temporal
         st.header("📈 Reclamos Liquidados")
 
@@ -205,7 +205,7 @@ if uploaded_file:
         
         # Mostrar datos crudos
         st.header("📄 Datos Crudos")
-        st.dataframe(df, use_container_width=True)
+        st.dataframe(df2, use_container_width=True)
 
     
     else:
