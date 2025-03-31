@@ -56,7 +56,7 @@ if uploaded_file:
         pendientes_filtrados = pendientes[pendientes['FECHA SINIESTRO'].dt.year == año_analisis]
         
         # Análisis temporal
-        st.header("📅 Distribución Temporal de Reclamos")
+        st.header("📈 Reclamos Liquidados")
 
         if not liquidados_filtrados.empty:
             # Gráfico de reclamos por mes
@@ -200,9 +200,6 @@ if uploaded_file:
                 plt.title('Distribución de Días Pendientes')
                 st.pyplot(fig)
 
-
-
-        
         else:
             st.info("No hay reclamos pendientes para el año seleccionado")
         
