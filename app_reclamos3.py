@@ -42,7 +42,14 @@ if uploaded_file:
             top_n = st.slider("Top N Causas", 3, 10, 5)
             bins_hist = st.slider("Bins para Histograma", 10, 100, 30)
                             # Filtros principales
-            producto = ['Todas'] + sorted(df['BASE'].unique().tolist())
+          # Generar lista de productos con manejo seguro de NaN
+            base_values = df['BASE'].copy()
+            
+            if base_values.isna().any():
+                print(f"⚠️ Advertencia: {base_values.isna().sum()} valores NaN detectados en 'BASE'")
+                base_values = base_values.fillna('No especificado')
+            
+            producto = ['Todas'] + sorted(base_values.unique().tolist())
             producto_sel = st.selectbox("Seleccionar Producto", producto)
             df_filtrado = df.copy()
             if producto_sel != 'Todas':
