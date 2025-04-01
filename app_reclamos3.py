@@ -47,7 +47,7 @@ if uploaded_file:
             
             if base_values.isna().any():
                 print(f"⚠️ Advertencia: {base_values.isna().sum()} valores NaN detectados en 'BASE'")
-                base_values = base_values.fillna('No especificado')
+                df = df.fillna('No especificado')
             
             producto = ['Todas'] + sorted(base_values.unique().tolist())
             producto_sel = st.selectbox("Seleccionar Producto", producto)
