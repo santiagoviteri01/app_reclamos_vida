@@ -47,7 +47,7 @@ if uploaded_file:
             producto = ['Todas'] + sorted(unique_bases)
             
             # Opción 2: Reemplazar NaN con un valor por defecto
-            df = df['BASE'].fillna('No especificado').unique().tolist()
+            df['BASE'] = df['BASE'].fillna('No especificado').str.upper()
             producto = ['Todas'] + sorted(df)
             producto_sel = st.selectbox("Seleccionar Producto", producto)
             df_filtrado = df.copy()
