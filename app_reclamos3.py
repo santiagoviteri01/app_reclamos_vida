@@ -10,7 +10,7 @@ usuarios = {
     "wiga": {
         "email": "wiga@empresa.com",
         "nombre": "Usuario Wiga",
-        "contraseña": stauth.Hasher(["contraseña_secreta123"]).generate()[0]  # Hashear la contraseña
+        #"contraseña": stauth.Hasher(["contraseña_secreta123"]).generate()[0]  # Hashear la contraseña
     }
 }
 
