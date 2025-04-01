@@ -50,12 +50,12 @@ if uploaded_file:
             unique_bases = df['BASE'].fillna('No especificado').unique().tolist()
             producto = ['Todas'] + sorted(unique_bases)
             producto_sel = st.selectbox("Seleccionar Producto", producto)
-            df_filtrado = df.copy()
+            df_filtrado = unique_bases.copy()
             if producto_sel != 'Todas':
-                df = df_filtrado[df_filtrado['BASE'] == producto_sel]
+                unique_bases = df_filtrado[df_filtrado['BASE'] == producto_sel]
 
-        liquidados = df[df['ESTADO'] == 'LIQUIDADO']
-        pendientes = df[df['ESTADO'] == 'PENDIENTE']
+        liquidados = unique_bases[unique_bases['ESTADO'] == 'LIQUIDADO']
+        pendientes = unique_bases[unique_bases['ESTADO'] == 'PENDIENTE']
         # Filtrar datos por año
         liquidados_filtrados = liquidados[liquidados['FECHA SINIESTRO'].dt.year == año_analisis]
         pendientes_filtrados = pendientes[pendientes['FECHA SINIESTRO'].dt.year == año_analisis]
