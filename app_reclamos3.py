@@ -119,7 +119,7 @@ if uploaded_file:
             plt.title('Distribución de Reclamos por Parentesco')
             st.pyplot(fig)
     
-                            # --- Sección 2: Distribución de Edades ---
+            # --- Sección 2: Distribución de Edades ---
             st.subheader("👥 Distribución de Edades")
                     
             # Crear bins personalizados
@@ -170,33 +170,33 @@ if uploaded_file:
             # Calcular distribución
             distribucion_agrencias = liquidados_filtrados['AGENCIA'].value_counts().sort_index()
             cola, colb = st.columns(2)
-            with cola:
-                fig, ax = plt.subplots(figsize=(12, 6))
-                sns.barplot(
+            fig, ax = plt.subplots(figsize=(12, 6))
+            sns.barplot(
                     x=distribucion_agrencias.index,
                     y=distribucion_agrencias.values,
                     palette="viridis",
                     ax=ax
                 )
                 
-                plt.title('Reclamos por Agencias', fontsize=14)
-                plt.xlabel('Agencia', fontsize=12)
-                plt.ylabel('Cantidad de Casos', fontsize=12)
-                plt.xticks(rotation=45)
-            with colb:
-              distribucion_asesores = liquidados_filtrados['ASESOR'].value_counts().sort_index()
-              fig, ax = plt.subplots(figsize=(12, 6))
-              sns.barplot(
+            plt.title('Reclamos por Agencias', fontsize=14)
+            plt.xlabel('Agencia', fontsize=12)
+            plt.ylabel('Cantidad de Casos', fontsize=12)
+            plt.xticks(rotation=45)
+            st.pyplot(fig)
+
+            distribucion_asesores = liquidados_filtrados['ASESOR'].value_counts().sort_index()
+            fig, ax = plt.subplots(figsize=(12, 6))
+            sns.barplot(
                     x=distribucion_asesores.index,
                     y=distribucion_asesores.values,
                     palette="viridis",
                     ax=ax
                 )
-                
-                plt.title('Reclamos por Asesor', fontsize=14)
-                plt.xlabel('Agencia', fontsize=12)
-                plt.ylabel('Cantidad de Casos', fontsize=12)
-                plt.xticks(rotation=45)
+              plt.title('Reclamos por Asesor', fontsize=14)
+              plt.xlabel('Agencia', fontsize=12)
+              plt.ylabel('Cantidad de Casos', fontsize=12)
+              plt.xticks(rotation=45)
+              st.pyplot(fig)
 
             # --- Sección 3: Tabla detallada ---
             with st.expander("📊 Ver datos detallados por grupo de edad"):
