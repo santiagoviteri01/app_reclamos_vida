@@ -192,11 +192,11 @@ if uploaded_file:
                     palette="viridis",
                     ax=ax
                 )
-              plt.title('Reclamos por Asesor', fontsize=14)
-              plt.xlabel('Agencia', fontsize=12)
-              plt.ylabel('Cantidad de Casos', fontsize=12)
-              plt.xticks(rotation=45)
-              st.pyplot(fig)
+            plt.title('Reclamos por Asesor', fontsize=14)
+            plt.xlabel('Agencia', fontsize=12)
+            plt.ylabel('Cantidad de Casos', fontsize=12)
+            plt.xticks(rotation=45)
+            st.pyplot(fig)
 
             # --- Sección 3: Tabla detallada ---
             with st.expander("📊 Ver datos detallados por grupo de edad"):
