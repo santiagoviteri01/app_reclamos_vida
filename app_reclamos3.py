@@ -18,7 +18,7 @@ usuarios = {
 
 authenticator = stauth.Authenticate(
     usuarios,
-    cookie_name="app_reclamos3",
+    cookie_name="insuratlanlifeapp",
     key="clave_secreta_aleatoria",
     cookie_expiry_days=30
 )
