@@ -232,7 +232,7 @@ if uploaded_file:
                     ax=ax
                 )
             plt.title('Reclamos por Asesor', fontsize=14)
-            plt.xlabel('Agencia', fontsize=12)
+            plt.xlabel('Asesor', fontsize=12)
             plt.ylabel('Cantidad de Casos', fontsize=12)
             plt.xticks(rotation=45)
             st.pyplot(fig)
