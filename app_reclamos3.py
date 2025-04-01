@@ -54,8 +54,8 @@ if uploaded_file:
             if producto_sel != 'Todas':
                 df = df_filtrado[df_filtrado['BASE'] == producto_sel]
 
-        liquidados = df[unique_bases['ESTADO'] == 'LIQUIDADO']
-        pendientes = df[unique_bases['ESTADO'] == 'PENDIENTE']
+        liquidados = df[df['ESTADO'] == 'LIQUIDADO']
+        pendientes = df[df['ESTADO'] == 'PENDIENTE']
         # Filtrar datos por año
         liquidados_filtrados = liquidados[liquidados['FECHA SINIESTRO'].dt.year == año_analisis]
         pendientes_filtrados = pendientes[pendientes['FECHA SINIESTRO'].dt.year == año_analisis]
