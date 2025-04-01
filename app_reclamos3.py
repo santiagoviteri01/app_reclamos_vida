@@ -5,24 +5,6 @@ import seaborn as sns
 from datetime import datetime
 import streamlit_authenticator as stauth
 
-# Configuración de autenticación
-usuarios = {
-    "wiga": {
-        "email": "wiga@empresa.com",
-        "nombre": "Usuario Wiga",
-        #"contraseña": stauth.Hasher(["contraseña_secreta123"]).generate()[0]  # Hashear la contraseña
-    }
-}
-
-authenticator = stauth.Authenticate(
-    usuarios,
-    "app_reclamos",  # Nombre de la cookie
-    "clave_secreta_aleatoria",  # Clave de encriptación
-    30  # Tiempo de expiración en días
-)
-
-
-
 # Configuración corregida
 usuarios = {
     "usernames": {
@@ -50,17 +32,6 @@ elif estado_autenticacion is False:
     st.error("Credenciales inválidas")
 elif estado_autenticacion is None:
     st.warning("Ingrese sus credenciales")
-# Mostrar formulario de login
-nombre, estado_autenticacion, username = authenticator.login("Inicio de Sesión", "main")
-
-# Manejar estados de autenticación
-if not estado_autenticacion:
-    st.error("Usuario/contraseña incorrectos o cuenta inactiva")
-    st.stop()
-
-if estado_autenticacion is None:
-    st.warning("Por favor ingrese su usuario y contraseña")
-    st.stop()
     
 
 if estado_autenticacion:
