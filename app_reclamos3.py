@@ -18,10 +18,11 @@ usuarios = {
 
 authenticator = stauth.Authenticate(
     usuarios,
-    cookie_name="app_reclamos",
+    cookie_name="app_reclamos3",
     key="clave_secreta_aleatoria",
     cookie_expiry_days=30
 )
+
 
 nombre, estado_autenticacion, username = authenticator.login("Login", "main")
 
