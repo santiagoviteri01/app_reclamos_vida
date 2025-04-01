@@ -21,6 +21,35 @@ authenticator = stauth.Authenticate(
     30  # Tiempo de expiración en días
 )
 
+
+
+# Configuración corregida
+usuarios = {
+    "usernames": {
+        "wiga": {
+            "email": "wiga@empresa.com",
+            "name": "Usuario Wiga",
+            "password": stauth.Hasher(["contraseña_secreta123"]).generate()[0]
+        }
+    }
+}
+
+authenticator = stauth.Authenticate(
+    usuarios,
+    cookie_name="app_reclamos",
+    key="clave_secreta_aleatoria",
+    cookie_expiry_days=30
+)
+
+nombre, estado_autenticacion, username = authenticator.login("Login", "main")
+
+if estado_autenticacion:
+    # Resto de tu aplicación aquí
+    st.success("¡Bienvenido!")
+elif estado_autenticacion is False:
+    st.error("Credenciales inválidas")
+elif estado_autenticacion is None:
+    st.warning("Ingrese sus credenciales")
 # Mostrar formulario de login
 nombre, estado_autenticacion, username = authenticator.login("Inicio de Sesión", "main")
 
