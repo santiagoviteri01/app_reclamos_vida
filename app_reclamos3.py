@@ -47,15 +47,15 @@ if uploaded_file:
             producto = ['Todas'] + sorted(unique_bases)
             
             # Opción 2: Reemplazar NaN con un valor por defecto
-            unique_bases = df['BASE'].fillna('No especificado').unique().tolist()
-            producto = ['Todas'] + sorted(unique_bases)
+            df = df['BASE'].fillna('No especificado').unique().tolist()
+            producto = ['Todas'] + sorted(df)
             producto_sel = st.selectbox("Seleccionar Producto", producto)
-            df_filtrado = unique_bases.copy()
+            df_filtrado = df.copy()
             if producto_sel != 'Todas':
-                unique_bases = df_filtrado[df_filtrado['BASE'] == producto_sel]
+                df = df_filtrado[df_filtrado['BASE'] == producto_sel]
 
-        liquidados = unique_bases[unique_bases['ESTADO'] == 'LIQUIDADO']
-        pendientes = unique_bases[unique_bases['ESTADO'] == 'PENDIENTE']
+        liquidados = df[unique_bases['ESTADO'] == 'LIQUIDADO']
+        pendientes = df[unique_bases['ESTADO'] == 'PENDIENTE']
         # Filtrar datos por año
         liquidados_filtrados = liquidados[liquidados['FECHA SINIESTRO'].dt.year == año_analisis]
         pendientes_filtrados = pendientes[pendientes['FECHA SINIESTRO'].dt.year == año_analisis]
