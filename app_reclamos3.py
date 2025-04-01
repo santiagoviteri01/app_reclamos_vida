@@ -7,7 +7,8 @@ from datetime import datetime
 # Configuración de usuarios y contraseñas
 USUARIOS = {
     "wiga": "contraseña_secreta123",
-    "admin": "admin123"
+    "admin": "admin123",
+    "dany":"futbol123"
 }
 
 # Función de autenticación básica
