@@ -49,7 +49,6 @@ if uploaded_file:
                 df = df_filtrado[df_filtrado['BASE'] == producto_sel]
 
         liquidados = df[df['ESTADO'] == 'LIQUIDADO']
-      
         pendientes = df[df['ESTADO'] == 'PENDIENTE']
         # Filtrar datos por año
         liquidados_filtrados = liquidados[liquidados['FECHA SINIESTRO'].dt.year == año_analisis]
@@ -166,7 +165,39 @@ if uploaded_file:
                 )
             
             st.pyplot(fig)
-            
+          
+            st.subheader("Análisis de Agencias y de Personal")
+            # Calcular distribución
+            distribucion_agrencias = liquidados_filtrados['AGENCIA'].value_counts().sort_index()
+            cola, colb = st.columns(2)
+            with cola:
+                fig, ax = plt.subplots(figsize=(12, 6))
+                sns.barplot(
+                    x=distribucion_agrencias.index,
+                    y=distribucion_agrencias.values,
+                    palette="viridis",
+                    ax=ax
+                )
+                
+                plt.title('Reclamos por Agencias', fontsize=14)
+                plt.xlabel('Agencia', fontsize=12)
+                plt.ylabel('Cantidad de Casos', fontsize=12)
+                plt.xticks(rotation=45)
+            with colb:
+              distribucion_asesores = liquidados_filtrados['ASESOR'].value_counts().sort_index()
+              fig, ax = plt.subplots(figsize=(12, 6))
+              sns.barplot(
+                    x=distribucion_asesores.index,
+                    y=distribucion_asesores.values,
+                    palette="viridis",
+                    ax=ax
+                )
+                
+                plt.title('Reclamos por Asesor', fontsize=14)
+                plt.xlabel('Agencia', fontsize=12)
+                plt.ylabel('Cantidad de Casos', fontsize=12)
+                plt.xticks(rotation=45)
+
             # --- Sección 3: Tabla detallada ---
             with st.expander("📊 Ver datos detallados por grupo de edad"):
                 st.dataframe(
