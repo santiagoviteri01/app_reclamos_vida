@@ -119,7 +119,7 @@ if uploaded_file:
                     help="Tiempo promedio desde que ocurre el siniestro hasta su notificación"
                 )
             with col2:
-                st.metric("Valor Total Liquidado", f"${liquidados_filtrados['VALOR INDEMNIZADO'].sum():,.2f}")
+                st.metric("Valor Total Liquidado", f"${liquidados_filtrados['VALOR'].sum():,.2f}")
                 st.metric("Edad Promedio de Fallecimiendo", f"{df['EDAD'].mean():,.2f}")
             
             # Análisis de valores
@@ -129,14 +129,14 @@ if uploaded_file:
             with col4:
                 # Histograma
                 fig = plt.figure(figsize=(10, 5))
-                sns.histplot(liquidados_filtrados['VALOR INDEMNIZADO'], bins=bins_hist, kde=True, color='purple')
+                sns.histplot(liquidados_filtrados['VALOR'], bins=bins_hist, kde=True, color='purple')
                 plt.title('Distribución de Valores Asegurados')
                 st.pyplot(fig)
             
             with col5:
                 # Boxplot
                 fig = plt.figure(figsize=(10, 5))
-                sns.boxplot(x=liquidados_filtrados['VALOR INDEMNIZADO'], color='orange')
+                sns.boxplot(x=liquidados_filtrados['VALOR'], color='orange')
                 plt.title('Distribución de Valores (Boxplot)')
                 st.pyplot(fig)
             
