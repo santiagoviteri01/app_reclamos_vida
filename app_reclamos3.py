@@ -11,6 +11,42 @@ USUARIOS = {
     "dany":"futbol123"
 }
 
+def visualizar_estadisticas_pendientes(pendientes_df: pd.DataFrame, titulo: str = "Reclamos Pendientes"):
+    """
+    Muestra estadísticas visuales de reclamos pendientes en dos columnas.
+    
+    Args:
+        pendientes_df (pd.DataFrame): DataFrame con los reclamos pendientes
+        titulo (str): Título principal de la sección
+    """
+    if not pendientes_df.empty:
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Gráfico de causas
+            fig = plt.figure(figsize=(10, 5))
+            sns.countplot(y='CAUSA SINIESTRO', data=pendientes_df, 
+                        order=pendientes_df['CAUSA SINIESTRO'].value_counts().index)
+            plt.title(f'Causas de {titulo}')
+            plt.xlabel('Cantidad')
+            plt.ylabel('Causa del siniestro')
+            st.pyplot(fig)
+            plt.close(fig)
+            
+        with col2:
+            # Gráfico de días pendientes
+            pendientes_df['DIAS PENDIENTES'] = (datetime.now() - pendientes_df['FECHA SINIESTRO']).dt.days
+            
+            fig = plt.figure(figsize=(10, 5))
+            sns.histplot(pendientes_df['DIAS PENDIENTES'], bins=20, kde=True, color='salmon')
+            plt.title(f'Distribución de Días en {titulo}')
+            plt.xlabel('Días transcurridos')
+            plt.ylabel('Cantidad de reclamos')
+            st.pyplot(fig)
+            plt.close(fig)
+    else:
+        st.info(f"No hay {titulo.lower()} para los filtros seleccionados")
+        
 # Función de autenticación básica
 def autenticacion():
     if 'autenticado' not in st.session_state:
@@ -88,10 +124,15 @@ if uploaded_file:
                 df = df_filtrado[df_filtrado['BASE'] == producto_sel]
 
         liquidados = df[df['ESTADO'] == 'LIQUIDADO']
-        pendientes = df[df['ESTADO'] == 'PENDIENTE']
+        pendientes = df[df['ESTADO'] == 'PENDIENTE DE DOCUMENTOS']
+        negados= df[df['ESTADO'] == 'NEGADO']
+        procesados= df[df['ESTADO'] == 'EN PROCESO']
+        
         # Filtrar datos por año
         liquidados_filtrados = liquidados[liquidados['FECHA SINIESTRO'].dt.year == año_analisis]
         pendientes_filtrados = pendientes[pendientes['FECHA SINIESTRO'].dt.year == año_analisis]
+        negados_filtrados = negados[negados['FECHA SINIESTRO'].dt.year == año_analisis]
+        procesados_filtrados = procesados[procesados['FECHA SINIESTRO'].dt.year == año_analisis]
         df2=df[df['FECHA SINIESTRO'].dt.year == año_analisis]
         # Análisis temporal
         st.header("📈 Reclamos Liquidados")
@@ -272,6 +313,8 @@ if uploaded_file:
 
         else:
             st.info("No hay reclamos pendientes para el año seleccionado")
+
+        visualizar_estadisticas_pendientes(pendientes_filtrados,titulo="Reclamos Pendientes del Año")
         
         # Mostrar datos crudos
         st.header("📄 Datos Crudos")
