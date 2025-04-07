@@ -20,6 +20,7 @@ def visualizar_estadisticas_pendientes(pendientes_df: pd.DataFrame, titulo: str 
         titulo (str): Título principal de la sección
     """
     if not pendientes_df.empty:
+        st.header(titulo)
         col1, col2 = st.columns(2)
         
         with col1:
@@ -314,8 +315,8 @@ if uploaded_file:
         else:
             st.info("No hay reclamos pendientes para el año seleccionado")
 
-        visualizar_estadisticas_pendientes(negados_filtrados,titulo="Reclamos Negados en el Año")
-        visualizar_estadisticas_pendientes(procesados_filtrados,titulo="Reclamos Procesados en el Año")
+        visualizar_estadisticas_pendientes(negados_filtrados,titulo="Reclamos Negados")
+        visualizar_estadisticas_pendientes(procesados_filtrados,titulo="Reclamos Procesados")
 
         
         # Mostrar datos crudos
