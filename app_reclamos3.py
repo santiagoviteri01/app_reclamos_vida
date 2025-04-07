@@ -314,7 +314,9 @@ if uploaded_file:
         else:
             st.info("No hay reclamos pendientes para el año seleccionado")
 
-        visualizar_estadisticas_pendientes(pendientes_filtrados,titulo="Reclamos Pendientes del Año")
+        visualizar_estadisticas_pendientes(negados_filtrados,titulo="Reclamos Negados en el Año")
+        visualizar_estadisticas_pendientes(procesados_filtrados,titulo="Reclamos Procesados en el Año")
+
         
         # Mostrar datos crudos
         st.header("📄 Datos Crudos")
