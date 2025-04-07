@@ -291,7 +291,7 @@ if uploaded_file:
             st.info("No hay reclamos liquidados para el año seleccionado")
 
         # Análisis de pendientes
-        st.header("⏳ Reclamos Pendientes")
+        st.header("Reclamos Pendientes")
         
         if not pendientes_filtrados.empty:
             col6, col7 = st.columns(2)
