@@ -126,7 +126,7 @@ if uploaded_file:
                 df = df_filtrado[df_filtrado['BASE'] == producto_sel]
 
         liquidados = df[df['ESTADO'] == 'LIQUIDADO']
-        pendientes = df[df['ESTADO'] == 'PENDIENTE DE DOCUMENTOS']
+        pendientes = df[df['ESTADO'] == 'PENDIENTE DOCUMENTOS']
         negados= df[df['ESTADO'] == 'NEGADO']
         procesados= df[df['ESTADO'] == 'EN PROCESO']
         
