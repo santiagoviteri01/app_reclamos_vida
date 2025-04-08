@@ -35,8 +35,9 @@ def visualizar_estadisticas_pendientes(pendientes_df: pd.DataFrame, titulo: str 
             plt.close(fig)
             
         with col2:
-            # Gráfico de días pendientes
-            pendientes_df['DIAS PENDIENTES'] = (datetime.now() - pendientes_df['FECHA SINIESTRO']).dt.days
+            # Gráfico de días pendientesFECHA NOTIFICACION SINIESTRO
+
+            pendientes_df['DIAS PENDIENTES'] = (pendientes_df['FECHA NOTIFICACION SINIESTRO'] - pendientes_df['FECHA SINIESTRO']).dt.days
             
             fig = plt.figure(figsize=(10, 5))
             sns.histplot(pendientes_df['DIAS PENDIENTES'], bins=20, kde=True, color='salmon')
