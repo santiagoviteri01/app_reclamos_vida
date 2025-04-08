@@ -168,20 +168,20 @@ if uploaded_file:
             # Análisis de VALOR INDEMNIZADOes
             st.header("💰 Análisis de Valores Asegurados")
             
-            col4, col5 = st.columns(2)
-            with col4:
-                # Histograma
-                fig = plt.figure(figsize=(10, 5))
-                sns.histplot(liquidados_filtrados['VALOR INDEMNIZADO'], bins=bins_hist, kde=True, color='purple')
-                plt.title('Distribución de Valores Asegurados')
-                st.pyplot(fig)
+            #col4, col5 = st.columns(2)
+            #with col4:
+            # Histograma
+            fig = plt.figure(figsize=(10, 5))
+            sns.histplot(liquidados_filtrados['VALOR INDEMNIZADO'], bins=bins_hist, kde=True, color='purple')
+            plt.title('Distribución de Valores Asegurados')
+            st.pyplot(fig)
             
-            with col5:
-                # Boxplot
-                fig = plt.figure(figsize=(10, 5))
-                sns.boxplot(x=liquidados_filtrados['VALOR INDEMNIZADO'], color='orange')
-                plt.title('Distribución de Valores (Boxplot)')
-                st.pyplot(fig)
+            #with col5:
+             #   # Boxplot
+                #fig = plt.figure(figsize=(10, 5))
+                #sns.boxplot(x=liquidados_filtrados['VALOR INDEMNIZADO'], color='orange')
+                #plt.title('Distribución de Valores (Boxplot)')
+                #st.pyplot(fig)
             
             # Análisis de causas
             st.header("🩺 Análisis de Causas de Siniestros")
