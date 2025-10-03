@@ -308,6 +308,7 @@ with tab1:
                         plt.ylabel('Cantidad de Casos', fontsize=12)
                         plt.xticks(rotation=45)
                         st.pyplot(fig)
+
             else:
                 st.info("No hay reclamos liquidados para el año seleccionado")
 
@@ -330,7 +331,7 @@ with tab1:
                     plt.title('Distribución de Días Pendientes')
                     st.pyplot(fig)
             else:
-                st.info("No hay reclamos pendientes para el año seleccionado")
+                st.info("No hay reclamos con estado 'PENDIENTE DOCUMENTOS' para el año seleccionado")
 
             visualizar_estadisticas_pendientes(negados_filtrados, titulo="Reclamos Negados")
             visualizar_estadisticas_pendientes(procesados_filtrados, titulo="Reclamos Procesados")
@@ -506,7 +507,3 @@ with tab2:
             st.warning("No se pudo cargar el archivo. Verifica el formato.")
     else:
         st.info("👋 Por favor sube un archivo Excel de reclamos de hogar para comenzar")
-            st.warning("No se pudo cargar el archivo. Verifica el formato.")
-    else:
-        st.info("👋 Por favor sube un archivo Excel de reclamos de hogar para comenzar")
-
