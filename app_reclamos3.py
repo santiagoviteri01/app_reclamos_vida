@@ -98,7 +98,7 @@ with st.sidebar:
 st.title("📊 Análisis de Reclamos de Seguros")
 
 # Tabs para separar los análisis
-tab1, tab2 = st.tabs(["👤 Reclamos de Vida", "🏠 Reclamos de Hogar/Propiedad"])
+tab1, tab2, tab3 = st.tabs(["👤 Reclamos de Vida", "🏠 Reclamos de Hogar/Propiedad", "💳 Cuota Protegida"])
 
 # ==============================================
 # TAB 1: ANÁLISIS DE RECLAMOS DE VIDA (DESGRAVAMEN)
