@@ -101,19 +101,38 @@ st.title("📊 Análisis de Reclamos de Seguros")
 tab1, tab2 = st.tabs(["👤 Reclamos de Vida", "🏠 Reclamos de Hogar/Propiedad"])
 
 # ==============================================
-# TAB 1: ANÁLISIS DE RECLAMOS DE VIDA
+# TAB 1: ANÁLISIS DE RECLAMOS DE VIDA (DESGRAVAMEN)
 # ==============================================
 with tab1:
-    st.header("Análisis de Reclamos de Vida")
-    uploaded_file_vida = st.file_uploader("Sube tu archivo Excel - Reclamos de Vida", type=["xlsx", "xls"], key="vida")
+    st.header("Análisis de Reclamos de Vida - Desgravamen")
+    uploaded_file_vida = st.file_uploader("Sube tu archivo Excel - Reclamos de Vida/Desgravamen", type=["xlsx", "xls"], key="vida")
 
     if uploaded_file_vida:
         df = load_data(uploaded_file_vida)
         
         if df is not None:
             st.success("Datos cargados correctamente ✅")
+            
+            # Procesar fechas
             df['FECHA SINIESTRO'] = pd.to_datetime(df['FECHA SINIESTRO'], errors='coerce')
             df['FECHA NOTIFICACION SINIESTRO'] = pd.to_datetime(df['FECHA NOTIFICACION SINIESTRO'], errors='coerce')
+            df['FECHA DE CIERRE/INDEMNIZACION'] = pd.to_datetime(df['FECHA DE CIERRE/INDEMNIZACION'], errors='coerce')
+            df['INICIO VIGENCIA'] = pd.to_datetime(df['INICIO VIGENCIA'], errors='coerce')
+            df['FIN VIGENCIA'] = pd.to_datetime(df['FIN VIGENCIA'], errors='coerce')
+            
+            # Verificar si tiene columna EDAD (para bases antiguas) o calcularla
+            if 'EDAD' not in df.columns:
+                st.info("ℹ️ Este archivo no contiene columna EDAD. Algunas métricas de edad no estarán disponibles.")
+                tiene_edad = False
+            else:
+                tiene_edad = True
+            
+            # Verificar si tiene columna PARENTESCO
+            tiene_parentesco = 'PARENTESCO' in df.columns
+            
+            # Verificar si tiene columnas AGENCIA y ASESOR
+            tiene_agencia = 'AGENCIA' in df.columns
+            tiene_asesor = 'ASESOR' in df.columns
             
             # Sidebar controls
             with st.sidebar:
@@ -132,13 +151,13 @@ with tab1:
                     df = df_filtrado[df_filtrado['BASE'] == producto_sel]
 
             liquidados = df[df['ESTADO'] == 'LIQUIDADO']
-            pendientes = df[df['ESTADO'] == 'PENDIENTE DOCUMENTOS']
+            pendientes = df[df['ESTADO'] == 'PENDIENTE DOCUMENTOS'] if 'PENDIENTE DOCUMENTOS' in df['ESTADO'].values else pd.DataFrame()
             negados = df[df['ESTADO'] == 'NEGADO']
             procesados = df[df['ESTADO'] == 'EN PROCESO']
             
             # Filtrar datos por año
             liquidados_filtrados = liquidados[liquidados['FECHA SINIESTRO'].dt.year == año_analisis]
-            pendientes_filtrados = pendientes[pendientes['FECHA SINIESTRO'].dt.year == año_analisis]
+            pendientes_filtrados = pendientes[pendientes['FECHA SINIESTRO'].dt.year == año_analisis] if not pendientes.empty else pd.DataFrame()
             negados_filtrados = negados[negados['FECHA SINIESTRO'].dt.year == año_analisis]
             procesados_filtrados = procesados[procesados['FECHA SINIESTRO'].dt.year == año_analisis]
             df2 = df[df['FECHA SINIESTRO'].dt.year == año_analisis]
@@ -160,7 +179,9 @@ with tab1:
                 # Métricas resumen
                 col1, col2 = st.columns(2)
                 liquidados_filtrados['TIEMPO_RESPUESTA'] = (liquidados_filtrados['FECHA NOTIFICACION SINIESTRO'] - liquidados_filtrados['FECHA SINIESTRO']).dt.days
+                liquidados_filtrados['TIEMPO_CIERRE'] = (liquidados_filtrados['FECHA DE CIERRE/INDEMNIZACION'] - liquidados_filtrados['FECHA SINIESTRO']).dt.days
                 tiempo_promedio = liquidados_filtrados['TIEMPO_RESPUESTA'].mean()
+                
                 with col1:
                     st.metric("Total Reclamos Liquidados", f"{len(liquidados_filtrados):,}")
                     st.metric(
@@ -169,8 +190,11 @@ with tab1:
                         help="Tiempo promedio desde que ocurre el siniestro hasta su notificación"
                     )
                 with col2:
-                    st.metric("Valor Total Liquidado", f"${liquidados_filtrados['VALOR INDEMNIZADO'].sum():,.2f}")
-                    st.metric("Edad Promedio de Fallecimiento", f"{df['EDAD'].mean():,.2f}")
+                    st.metric("Valor Total Indemnizado", f"${liquidados_filtrados['VALOR INDEMNIZADO'].sum():,.2f}")
+                    if tiene_edad:
+                        st.metric("Edad Promedio", f"{df['EDAD'].mean():.1f} años")
+                    else:
+                        st.metric("Plazo Promedio Crédito", f"{liquidados_filtrados['PLAZO'].mean():.1f} meses")
                 
                 # Análisis de valores
                 st.header("💰 Análisis de Valores Asegurados")
@@ -190,94 +214,100 @@ with tab1:
                 plt.xlabel('Cantidad de Reclamos')
                 st.pyplot(fig)
                 
-                # Análisis de parentesco
-                st.header("👪 Distribución por Parentesco")
-                fig, ax = plt.subplots(figsize=(8, 6))
-                sns.countplot(y='PARENTESCO', data=liquidados_filtrados, order=liquidados_filtrados['PARENTESCO'].value_counts().index)
-                plt.title('Distribución de Reclamos por Parentesco')
-                st.pyplot(fig)
+                # Análisis de parentesco (solo si existe la columna)
+                if tiene_parentesco:
+                    st.header("👪 Distribución por Parentesco")
+                    fig, ax = plt.subplots(figsize=(8, 6))
+                    sns.countplot(y='PARENTESCO', data=liquidados_filtrados, order=liquidados_filtrados['PARENTESCO'].value_counts().index)
+                    plt.title('Distribución de Reclamos por Parentesco')
+                    st.pyplot(fig)
         
-                # Distribución de Edades
-                st.subheader("👥 Distribución de Edades")
-                        
-                bins = [0, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 120]
-                labels = [
-                    '0-20', '20-25', '25-30', '30-35', '35-40', 
-                    '40-45', '45-50', '50-55', '55-60', '60-65',
-                    '65-70', '70-75', '75-80', '80-85', '85+'
-                ]
-                
-                liquidados_filtrados['GRUPO_EDAD'] = pd.cut(
-                    liquidados_filtrados['EDAD'],
-                    bins=bins,
-                    labels=labels,
-                    right=False
-                )
-                
-                distribucion_edades = liquidados_filtrados['GRUPO_EDAD'].value_counts().sort_index()
-                
-                fig, ax = plt.subplots(figsize=(12, 6))
-                sns.barplot(
-                    x=distribucion_edades.index,
-                    y=distribucion_edades.values,
-                    palette="viridis",
-                    ax=ax
-                )
-                
-                plt.title('Distribución de Edades por Grupo', fontsize=14)
-                plt.xlabel('Grupo de Edad', fontsize=12)
-                plt.ylabel('Cantidad de Casos', fontsize=12)
-                plt.xticks(rotation=45)
-                
-                for p in ax.patches:
-                    ax.annotate(
-                        f'{int(p.get_height())}', 
-                        (p.get_x() + p.get_width() / 2., p.get_height()),
-                        ha='center', va='center', 
-                        xytext=(0, 5), 
-                        textcoords='offset points'
+                # Distribución de Edades (solo si existe la columna)
+                if tiene_edad:
+                    st.subheader("👥 Distribución de Edades")
+                            
+                    bins = [0, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 120]
+                    labels = [
+                        '0-20', '20-25', '25-30', '30-35', '35-40', 
+                        '40-45', '45-50', '50-55', '55-60', '60-65',
+                        '65-70', '70-75', '75-80', '80-85', '85+'
+                    ]
+                    
+                    liquidados_filtrados['GRUPO_EDAD'] = pd.cut(
+                        liquidados_filtrados['EDAD'],
+                        bins=bins,
+                        labels=labels,
+                        right=False
                     )
-                
-                st.pyplot(fig)
-            
-                st.subheader("📍 Análisis de Agencias y Personal")
-                
-                distribucion_agencias = liquidados_filtrados['AGENCIA'].value_counts().sort_index()
-                fig, ax = plt.subplots(figsize=(12, 6))
-                sns.barplot(
-                        x=distribucion_agencias.index,
-                        y=distribucion_agencias.values,
+                    
+                    distribucion_edades = liquidados_filtrados['GRUPO_EDAD'].value_counts().sort_index()
+                    
+                    fig, ax = plt.subplots(figsize=(12, 6))
+                    sns.barplot(
+                        x=distribucion_edades.index,
+                        y=distribucion_edades.values,
                         palette="viridis",
                         ax=ax
                     )
                     
-                plt.title('Reclamos por Agencias', fontsize=14)
-                plt.xlabel('Agencia', fontsize=12)
-                plt.ylabel('Cantidad de Casos', fontsize=12)
-                plt.xticks(rotation=45)
-                st.pyplot(fig)
+                    plt.title('Distribución de Edades por Grupo', fontsize=14)
+                    plt.xlabel('Grupo de Edad', fontsize=12)
+                    plt.ylabel('Cantidad de Casos', fontsize=12)
+                    plt.xticks(rotation=45)
+                    
+                    for p in ax.patches:
+                        ax.annotate(
+                            f'{int(p.get_height())}', 
+                            (p.get_x() + p.get_width() / 2., p.get_height()),
+                            ha='center', va='center', 
+                            xytext=(0, 5), 
+                            textcoords='offset points'
+                        )
+                    
+                    st.pyplot(fig)
+                    
+                    with st.expander("📊 Ver datos detallados por grupo de edad"):
+                        st.dataframe(
+                            distribucion_edades.reset_index().rename(
+                                columns={'index': 'Grupo de Edad', 'GRUPO_EDAD': 'Casos'}
+                            ).style.background_gradient(cmap='Blues'),
+                            use_container_width=True
+                        )
+            
+                # Análisis de agencias y personal (solo si existen las columnas)
+                if tiene_agencia or tiene_asesor:
+                    st.subheader("📍 Análisis de Agencias y Personal")
+                    
+                    if tiene_agencia:
+                        distribucion_agencias = liquidados_filtrados['AGENCIA'].value_counts().sort_index()
+                        fig, ax = plt.subplots(figsize=(12, 6))
+                        sns.barplot(
+                                x=distribucion_agencias.index,
+                                y=distribucion_agencias.values,
+                                palette="viridis",
+                                ax=ax
+                            )
+                            
+                        plt.title('Reclamos por Agencias', fontsize=14)
+                        plt.xlabel('Agencia', fontsize=12)
+                        plt.ylabel('Cantidad de Casos', fontsize=12)
+                        plt.xticks(rotation=45)
+                        st.pyplot(fig)
 
-                distribucion_asesores = liquidados_filtrados['ASESOR'].value_counts().sort_index()
-                fig, ax = plt.subplots(figsize=(12, 6))
-                sns.barplot(
-                        x=distribucion_asesores.index,
-                        y=distribucion_asesores.values,
-                        palette="viridis",
-                        ax=ax
-                    )
-                plt.title('Reclamos por Asesor', fontsize=14)
-                plt.xlabel('Asesor', fontsize=12)
-                plt.ylabel('Cantidad de Casos', fontsize=12)
-                plt.xticks(rotation=45)
-                st.pyplot(fig)
-
-                with st.expander("📊 Ver datos detallados por grupo de edad"):
-                    st.dataframe(
-                        distribucion_edades.reset_index().rename(
-                            columns={'index': 'Grupo de Edad', 'GRUPO_EDAD': 'Casos'}
-                        ).style.background_gradient(cmap='Blues'),
-                        use_container_width=True
-                    )
+                    if tiene_asesor:
+                        distribucion_asesores = liquidados_filtrados['ASESOR'].value_counts().sort_index()
+                        fig, ax = plt.subplots(figsize=(12, 6))
+                        sns.barplot(
+                                x=distribucion_asesores.index,
+                                y=distribucion_asesores.values,
+                                palette="viridis",
+                                ax=ax
+                            )
+                        plt.title('Reclamos por Asesor', fontsize=14)
+                        plt.xlabel('Asesor', fontsize=12)
+                        plt.ylabel('Cantidad de Casos', fontsize=12)
+                        plt.xticks(rotation=45)
+                        st.pyplot(fig)
             else:
                 st.info("No hay reclamos liquidados para el año seleccionado")
 
@@ -471,6 +501,11 @@ with tab2:
             # Datos crudos
             st.header("📄 Datos Crudos - Hogar")
             st.dataframe(df_hogar_año, use_container_width=True)
+            
+        else:
+            st.warning("No se pudo cargar el archivo. Verifica el formato.")
+    else:
+        st.info("👋 Por favor sube un archivo Excel de reclamos de hogar para comenzar")
             
         else:
             st.warning("No se pudo cargar el archivo. Verifica el formato.")
