@@ -506,8 +506,6 @@ with tab2:
             st.warning("No se pudo cargar el archivo. Verifica el formato.")
     else:
         st.info("👋 Por favor sube un archivo Excel de reclamos de hogar para comenzar")
-            
-        else:
             st.warning("No se pudo cargar el archivo. Verifica el formato.")
     else:
         st.info("👋 Por favor sube un archivo Excel de reclamos de hogar para comenzar")
