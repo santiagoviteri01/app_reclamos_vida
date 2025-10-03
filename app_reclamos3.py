@@ -507,3 +507,234 @@ with tab2:
             st.warning("No se pudo cargar el archivo. Verifica el formato.")
     else:
         st.info("👋 Por favor sube un archivo Excel de reclamos de hogar para comenzar")
+
+with tab3:
+    st.header("Análisis de Cuota Protegida")
+    uploaded_file_cuota = st.file_uploader("Sube tu archivo Excel - Cuota Protegida", type=["xlsx", "xls"], key="cuota")
+
+    if uploaded_file_cuota:
+        df_cuota = load_data(uploaded_file_cuota)
+        
+        if df_cuota is not None:
+            st.success("Datos de Cuota Protegida cargados correctamente ✅")
+            
+            # Procesar fechas
+            df_cuota['FECHA SINIESTRO'] = pd.to_datetime(df_cuota['FECHA SINIESTRO'], errors='coerce')
+            df_cuota['FECHA NOTIFICACION SINIESTRO'] = pd.to_datetime(df_cuota['FECHA NOTIFICACION SINIESTRO'], errors='coerce')
+            
+            # Sidebar controls
+            with st.sidebar:
+                st.header("⚙️ Configuración - Cuota Protegida")
+                año_analisis_cuota = st.selectbox("Seleccionar Año", sorted(df_cuota['FECHA SINIESTRO'].dt.year.unique()), key="año_cuota")
+                top_n_cuota = st.slider("Top N Causas", 3, 10, 5, key="top_cuota")
+                bins_hist_cuota = st.slider("Bins para Histograma", 10, 100, 30, key="bins_cuota")
+                
+                # Filtro por producto
+                df_cuota['BASE'] = df_cuota['BASE'].fillna('No especificado').str.upper()
+                productos_cuota = ['Todas'] + sorted(df_cuota['BASE'].unique().tolist())
+                producto_sel_cuota = st.selectbox("Seleccionar Producto", productos_cuota, key="prod_cuota")
+                
+                df_cuota_filtrado = df_cuota.copy()
+                if producto_sel_cuota != 'Todas':
+                    df_cuota = df_cuota_filtrado[df_cuota_filtrado['BASE'] == producto_sel_cuota]
+
+            # Separar por estado
+            liquidados_cuota = df_cuota[df_cuota['ESTADO'] == 'LIQUIDADO']
+            negados_cuota = df_cuota[df_cuota['ESTADO'] == 'NEGADO']
+            procesados_cuota = df_cuota[df_cuota['ESTADO'] == 'EN PROCESO']
+            
+            # Filtrar por año
+            liquidados_cuota_f = liquidados_cuota[liquidados_cuota['FECHA SINIESTRO'].dt.year == año_analisis_cuota]
+            negados_cuota_f = negados_cuota[negados_cuota['FECHA SINIESTRO'].dt.year == año_analisis_cuota]
+            procesados_cuota_f = procesados_cuota[procesados_cuota['FECHA SINIESTRO'].dt.year == año_analisis_cuota]
+            df_cuota_año = df_cuota[df_cuota['FECHA SINIESTRO'].dt.year == año_analisis_cuota]
+            
+            # Análisis de reclamos liquidados
+            st.header("📈 Reclamos de Cuota Protegida Liquidados")
+            
+            if not liquidados_cuota_f.empty:
+                # Gráfico temporal
+                fig, ax = plt.subplots(figsize=(10, 4))
+                liquidados_cuota_f['MES'] = liquidados_cuota_f['FECHA SINIESTRO'].dt.month
+                liquidados_cuota_f['MES'].value_counts().sort_index().plot(kind='bar', color='steelblue', ax=ax)
+                plt.title('Reclamos de Cuota Protegida Liquidados por Mes')
+                plt.xlabel('Mes')
+                plt.ylabel('Cantidad de Reclamos')
+                st.pyplot(fig)
+                
+                # Métricas principales
+                col1, col2, col3 = st.columns(3)
+                
+                liquidados_cuota_f['TIEMPO_RESPUESTA'] = (liquidados_cuota_f['FECHA NOTIFICACION SINIESTRO'] - liquidados_cuota_f['FECHA SINIESTRO']).dt.days
+                
+                with col1:
+                    st.metric("Total Reclamos", f"{len(liquidados_cuota_f):,}")
+                    st.metric("Días promedio notificación", f"{liquidados_cuota_f['TIEMPO_RESPUESTA'].mean():.1f} días")
+                
+                with col2:
+                    st.metric("Valor Total Indemnizado", f"${liquidados_cuota_f['VALOR INDEMNIZADO'].sum():,.2f}")
+                    if 'EDAD' in liquidados_cuota_f.columns:
+                        st.metric("Edad Promedio", f"{liquidados_cuota_f['EDAD'].mean():.1f} años")
+                
+                with col3:
+                    st.metric("Valor Promedio", f"${liquidados_cuota_f['VALOR INDEMNIZADO'].mean():.2f}")
+                    if 'PLAZO' in liquidados_cuota_f.columns:
+                        st.metric("Plazo Promedio Crédito", f"{liquidados_cuota_f['PLAZO'].mean():.1f} meses")
+                
+                # Distribución de valores indemnizados
+                st.header("💰 Análisis de Valores Indemnizados")
+                
+                fig = plt.figure(figsize=(10, 5))
+                sns.histplot(liquidados_cuota_f['VALOR INDEMNIZADO'], bins=bins_hist_cuota, kde=True, color='mediumseagreen')
+                plt.title('Distribución de Valores Indemnizados - Cuota Protegida')
+                plt.xlabel('Valor Indemnizado')
+                plt.ylabel('Frecuencia')
+                st.pyplot(fig)
+                
+                # Análisis de causas
+                st.header("🔍 Análisis de Causas de Siniestros")
+                
+                top_causas_cuota = liquidados_cuota_f['CAUSA SINIESTRO'].value_counts().nlargest(top_n_cuota)
+                fig, ax = plt.subplots(figsize=(10, 5))
+                sns.barplot(x=top_causas_cuota.values, y=top_causas_cuota.index, palette='Greens_r')
+                plt.title(f'Top {top_n_cuota} Causas de Siniestros - Cuota Protegida')
+                plt.xlabel('Cantidad de Reclamos')
+                st.pyplot(fig)
+                
+                # Análisis de parentesco si existe
+                if 'PARENTESCO' in liquidados_cuota_f.columns:
+                    st.header("👪 Distribución por Parentesco")
+                    fig, ax = plt.subplots(figsize=(8, 6))
+                    sns.countplot(y='PARENTESCO', data=liquidados_cuota_f, 
+                                order=liquidados_cuota_f['PARENTESCO'].value_counts().index)
+                    plt.title('Distribución de Reclamos por Parentesco')
+                    st.pyplot(fig)
+                
+                # Distribución de Edades si existe
+                if 'EDAD' in liquidados_cuota_f.columns:
+                    st.subheader("👥 Distribución de Edades")
+                            
+                    bins = [0, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 120]
+                    labels = [
+                        '0-20', '20-25', '25-30', '30-35', '35-40', 
+                        '40-45', '45-50', '50-55', '55-60', '60-65',
+                        '65-70', '70-75', '75-80', '80-85', '85+'
+                    ]
+                    
+                    liquidados_cuota_f['GRUPO_EDAD'] = pd.cut(
+                        liquidados_cuota_f['EDAD'],
+                        bins=bins,
+                        labels=labels,
+                        right=False
+                    )
+                    
+                    distribucion_edades_cuota = liquidados_cuota_f['GRUPO_EDAD'].value_counts().sort_index()
+                    
+                    fig, ax = plt.subplots(figsize=(12, 6))
+                    sns.barplot(
+                        x=distribucion_edades_cuota.index,
+                        y=distribucion_edades_cuota.values,
+                        palette="YlGn",
+                        ax=ax
+                    )
+                    
+                    plt.title('Distribución de Edades por Grupo - Cuota Protegida', fontsize=14)
+                    plt.xlabel('Grupo de Edad', fontsize=12)
+                    plt.ylabel('Cantidad de Casos', fontsize=12)
+                    plt.xticks(rotation=45)
+                    
+                    for p in ax.patches:
+                        ax.annotate(
+                            f'{int(p.get_height())}', 
+                            (p.get_x() + p.get_width() / 2., p.get_height()),
+                            ha='center', va='center', 
+                            xytext=(0, 5), 
+                            textcoords='offset points'
+                        )
+                    
+                    st.pyplot(fig)
+                    
+                    with st.expander("📊 Ver datos detallados por grupo de edad"):
+                        st.dataframe(
+                            distribucion_edades_cuota.reset_index().rename(
+                                columns={'index': 'Grupo de Edad', 'GRUPO_EDAD': 'Casos'}
+                            ).style.background_gradient(cmap='Greens'),
+                            use_container_width=True
+                        )
+                
+                # Análisis de agencias si existe
+                if 'AGENCIA' in liquidados_cuota_f.columns:
+                    st.subheader("📍 Análisis de Agencias")
+                    
+                    distribucion_agencias_cuota = liquidados_cuota_f['AGENCIA'].value_counts().sort_index()
+                    fig, ax = plt.subplots(figsize=(12, 6))
+                    sns.barplot(
+                        x=distribucion_agencias_cuota.index,
+                        y=distribucion_agencias_cuota.values,
+                        palette="YlGn",
+                        ax=ax
+                    )
+                    
+                    plt.title('Reclamos por Agencias - Cuota Protegida', fontsize=14)
+                    plt.xlabel('Agencia', fontsize=12)
+                    plt.ylabel('Cantidad de Casos', fontsize=12)
+                    plt.xticks(rotation=45)
+                    st.pyplot(fig)
+                
+                # Análisis de asesores si existe
+                if 'ASESOR' in liquidados_cuota_f.columns:
+                    distribucion_asesores_cuota = liquidados_cuota_f['ASESOR'].value_counts().sort_index()
+                    fig, ax = plt.subplots(figsize=(12, 6))
+                    sns.barplot(
+                        x=distribucion_asesores_cuota.index,
+                        y=distribucion_asesores_cuota.values,
+                        palette="YlGn",
+                        ax=ax
+                    )
+                    plt.title('Reclamos por Asesor - Cuota Protegida', fontsize=14)
+                    plt.xlabel('Asesor', fontsize=12)
+                    plt.ylabel('Cantidad de Casos', fontsize=12)
+                    plt.xticks(rotation=45)
+                    st.pyplot(fig)
+                
+                # Análisis temporal
+                st.header("⏱️ Análisis de Tiempos de Respuesta")
+                
+                fig = plt.figure(figsize=(10, 5))
+                sns.histplot(liquidados_cuota_f['TIEMPO_RESPUESTA'].dropna(), bins=20, kde=True, color='teal')
+                plt.title('Distribución - Días hasta Notificación')
+                plt.xlabel('Días')
+                plt.ylabel('Frecuencia')
+                st.pyplot(fig)
+                
+                # Tabla resumen de estadísticas
+                with st.expander("📊 Ver estadísticas detalladas de tiempos"):
+                    stats_df = pd.DataFrame({
+                        'Métrica': ['Notificación'],
+                        'Promedio (días)': [liquidados_cuota_f['TIEMPO_RESPUESTA'].mean()],
+                        'Mediana (días)': [liquidados_cuota_f['TIEMPO_RESPUESTA'].median()],
+                        'Mínimo (días)': [liquidados_cuota_f['TIEMPO_RESPUESTA'].min()],
+                        'Máximo (días)': [liquidados_cuota_f['TIEMPO_RESPUESTA'].max()]
+                    })
+                    st.dataframe(stats_df.style.format({
+                        'Promedio (días)': '{:.1f}',
+                        'Mediana (días)': '{:.1f}',
+                        'Mínimo (días)': '{:.0f}',
+                        'Máximo (días)': '{:.0f}'
+                    }), use_container_width=True)
+                
+            else:
+                st.info("No hay reclamos liquidados para el año seleccionado")
+            
+            # Reclamos negados y en proceso
+            visualizar_estadisticas_pendientes(negados_cuota_f, titulo="Reclamos de Cuota Protegida Negados")
+            visualizar_estadisticas_pendientes(procesados_cuota_f, titulo="Reclamos de Cuota Protegida en Proceso")
+            
+            # Datos crudos
+            st.header("📄 Datos Crudos - Cuota Protegida")
+            st.dataframe(df_cuota_año, use_container_width=True)
+            
+        else:
+            st.warning("No se pudo cargar el archivo. Verifica el formato.")
+    else:
+        st.info("👋 Por favor sube un archivo Excel de Cuota Protegida para comenzar")
