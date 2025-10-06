@@ -418,8 +418,9 @@ with tab2:
                 liquidados_hogar_f['TIEMPO_CIERRE'] = (liquidados_hogar_f['FECHA DE CIERRE/INDEMNIZACION'] - liquidados_hogar_f['FECHA SINIESTRO']).dt.days
                 
                 with col1:
-                    st.metric("Total Reclamos", f"{len(liquidados_hogar_f):,}")
-                    st.metric("Días promedio notificación", f"{liquidados_hogar_f['TIEMPO_RESPUESTA'].mean():.1f} días")
+                    total_reclamos=len(df_hogar_filtrado)
+                    st.metric("Total Reclamos", total_reclamos)
+                    st.metric("Días promedio notificación de liquidados", f"{liquidados_hogar_f['TIEMPO_RESPUESTA'].mean():.1f} días")
                 
                 with col2:
                     st.metric("Valor Total Indemnizado", f"${liquidados_hogar_f['VALOR INDEMNIZADO'].sum():,.2f}")
@@ -427,7 +428,7 @@ with tab2:
                 
                 with col3:
                     st.metric("Valor Promedio", f"${liquidados_hogar_f['VALOR INDEMNIZADO'].mean():,.2f}")
-                    st.metric("Plazo Promedio Crédito", f"{liquidados_hogar_f['PLAZO'].mean():.1f} meses")
+                    st.metric("Valor Total Reclamado", f"${liquidados_hogar_f['VALOR INDEMNIZADO'].sum():,.2f}")
                 
                 # Distribución de valores indemnizados
                 st.header("💰 Análisis de Valores Indemnizados")
