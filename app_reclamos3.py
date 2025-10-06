@@ -393,9 +393,9 @@ with tab2:
                 if producto_sel_hogar != 'Todas':
                     df_hogar_filtrado = df_hogar_filtrado[df_hogar_filtrado['BASE'] == producto_sel_hogar]
             # Separar por estado
-            liquidados_hogar = df_hogar[df_hogar['ESTADO'] == 'LIQUIDADO']
-            negados_hogar = df_hogar[df_hogar['ESTADO'] == 'NEGADO']
-            procesados_hogar = df_hogar[df_hogar['ESTADO'] == 'EN PROCESO']
+            liquidados_hogar = df_hogar_filtrado[df_hogar_filtrado['ESTADO'] == 'LIQUIDADO']
+            negados_hogar = df_hogar_filtrado[df_hogar_filtrado['ESTADO'] == 'NEGADO']
+            procesados_hogar = df_hogar_filtrado[df_hogar_filtrado['ESTADO'] == 'EN PROCESO']
             
             # Filtrar por año
             liquidados_hogar_f = liquidados_hogar[liquidados_hogar['FECHA SINIESTRO'].dt.year == año_analisis_hogar]
