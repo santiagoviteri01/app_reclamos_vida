@@ -531,7 +531,12 @@ with tab3:
             # Sidebar controls
             with st.sidebar:
                 st.header("⚙️ Configuración - Cuota Protegida")
-                año_analisis_cuota = st.selectbox("Seleccionar Año", sorted(df_cuota['FECHA SINIESTRO'].dt.year.unique()), key="año_cuota")
+                
+                # Filtro de año con opción "Todos"
+                años_disponibles = sorted(df_cuota['FECHA SINIESTRO'].dt.year.unique())
+                años_opciones = ['Todos'] + años_disponibles
+                año_analisis_cuota = st.selectbox("Seleccionar Año", años_opciones, key="año_cuota")
+                
                 top_n_cuota = st.slider("Top N Causas", 3, 10, 5, key="top_cuota")
                 bins_hist_cuota = st.slider("Bins para Histograma", 10, 100, 30, key="bins_cuota")
                 
@@ -539,21 +544,22 @@ with tab3:
                 df_cuota['BASE'] = df_cuota['BASE'].fillna('No especificado').str.upper()
                 productos_cuota = ['Todas'] + sorted(df_cuota['BASE'].unique().tolist())
                 producto_sel_cuota = st.selectbox("Seleccionar Producto", productos_cuota, key="prod_cuota")
-                
-                df_cuota_filtrado = df_cuota.copy()
-                if producto_sel_cuota != 'Todas':
-                    df_cuota = df_cuota_filtrado[df_cuota_filtrado['BASE'] == producto_sel_cuota]
-
-            # Separar por estado
-            liquidados_cuota = df_cuota[df_cuota['ESTADO'] == 'LIQUIDADO']
-            negados_cuota = df_cuota[df_cuota['ESTADO'] == 'NEGADO']
-            procesados_cuota = df_cuota[df_cuota['ESTADO'] == 'EN PROCESO']
             
-            # Filtrar por año
-            liquidados_cuota_f = liquidados_cuota[liquidados_cuota['FECHA SINIESTRO'].dt.year == año_analisis_cuota]
-            negados_cuota_f = negados_cuota[negados_cuota['FECHA SINIESTRO'].dt.year == año_analisis_cuota]
-            procesados_cuota_f = procesados_cuota[procesados_cuota['FECHA SINIESTRO'].dt.year == año_analisis_cuota]
-            df_cuota_año = df_cuota[df_cuota['FECHA SINIESTRO'].dt.year == año_analisis_cuota]
+            # Aplicar filtros
+            df_cuota_filtrado = df_cuota.copy()
+            
+            # Filtrar por año solo si no es "Todos"
+            if año_analisis_cuota != 'Todos':
+                df_cuota_filtrado = df_cuota_filtrado[df_cuota_filtrado['FECHA SINIESTRO'].dt.year == año_analisis_cuota]
+            
+            # Filtrar por producto solo si no es "Todas"
+            if producto_sel_cuota != 'Todas':
+                df_cuota_filtrado = df_cuota_filtrado[df_cuota_filtrado['BASE'] == producto_sel_cuota]
+
+            # Separar por estado (usando datos ya filtrados)
+            liquidados_cuota_f = df_cuota_filtrado[df_cuota_filtrado['ESTADO'] == 'LIQUIDADO']
+            negados_cuota_f = df_cuota_filtrado[df_cuota_filtrado['ESTADO'] == 'NEGADO']
+            procesados_cuota_f = df_cuota_filtrado[df_cuota_filtrado['ESTADO'] == 'EN PROCESO']
             
             # Análisis de reclamos liquidados
             st.header("📈 Reclamos de Cuota Protegida Liquidados")
@@ -730,7 +736,7 @@ with tab3:
                     }), use_container_width=True)
                 
             else:
-                st.info("No hay reclamos liquidados para el año seleccionado")
+                st.info("No hay reclamos liquidados para los filtros seleccionados")
             
             # Reclamos negados y en proceso
             visualizar_estadisticas_pendientes(negados_cuota_f, titulo="Reclamos de Cuota Protegida Negados")
@@ -738,7 +744,7 @@ with tab3:
             
             # Datos crudos
             st.header("📄 Datos Crudos - Cuota Protegida")
-            st.dataframe(df_cuota_año, use_container_width=True)
+            st.dataframe(df_cuota_filtrado, use_container_width=True)
             
         else:
             st.warning("No se pudo cargar el archivo. Verifica el formato.")
