@@ -412,15 +412,23 @@ with tab2:
                 st.pyplot(fig)
                 
                 # Métricas principales
-                col1, col2, col3 = st.columns(3)
+                col1,col4,col2,col3 = st.columns(4)
                 
                 liquidados_hogar_f['TIEMPO_RESPUESTA'] = (liquidados_hogar_f['FECHA NOTIFICACION SINIESTRO'] - liquidados_hogar_f['FECHA SINIESTRO']).dt.days
                 liquidados_hogar_f['TIEMPO_CIERRE'] = (liquidados_hogar_f['FECHA DE CIERRE/INDEMNIZACION'] - liquidados_hogar_f['FECHA SINIESTRO']).dt.days
                 
                 with col1:
                     total_reclamos=len(df_hogar_filtrado)
+
                     st.metric("Total Reclamos", total_reclamos)
                     st.metric("Días promedio notificación de liquidados", f"{liquidados_hogar_f['TIEMPO_RESPUESTA'].mean():.1f} días")
+                
+                with col4:
+                    total_negados==len(negados_hogar_f)
+                    total_proceso==len(procesados_hogar_f)
+                    st.metric("Total Reclamos Negados", total_negados)
+                    st.metric("Total Reclamos en Proceso", total_proceso)
+                    st.metric("Valor Total Reclamado en Proceso", f"${procesados_hogar_f['VALOR RECLAMADO'].sum():,.2f}")
                 
                 with col2:
                     st.metric("Valor Total Indemnizado", f"${liquidados_hogar_f['VALOR INDEMNIZADO'].sum():,.2f}")
