@@ -428,7 +428,7 @@ with tab2:
                 
                 with col3:
                     st.metric("Valor Promedio", f"${liquidados_hogar_f['VALOR INDEMNIZADO'].mean():,.2f}")
-                    st.metric("Valor Total Reclamado", f"${liquidados_hogar_f['VALOR RECLAMADO'].sum():,.2f}")
+                    st.metric("Valor Total Reclamado", f"${df_hogar_filtrado['VALOR RECLAMADO'].sum():,.2f}")
                 
                 # Distribución de valores indemnizados
                 st.header("💰 Análisis de Valores Indemnizados")
