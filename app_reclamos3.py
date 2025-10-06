@@ -385,11 +385,11 @@ with tab2:
                 # Aplicar filtros
                 df_hogar_filtrado = df_hogar.copy()
                 
-                # Filtrar por año (solo si no es "Todos")
+                # Filtrar por año solo si no es "Todos"
                 if año_analisis_hogar != 'Todos':
                     df_hogar_filtrado = df_hogar_filtrado[df_hogar_filtrado['FECHA SINIESTRO'].dt.year == año_analisis_hogar]
                 
-                # Filtrar por producto (solo si no es "Todas")
+                # Filtrar por producto solo si no es "Todas"
                 if producto_sel_hogar != 'Todas':
                     df_hogar_filtrado = df_hogar_filtrado[df_hogar_filtrado['BASE'] == producto_sel_hogar]
             # Separar por estado
