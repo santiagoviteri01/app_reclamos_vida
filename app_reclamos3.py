@@ -424,8 +424,8 @@ with tab2:
                     st.metric("Días promedio notificación de liquidados", f"{liquidados_hogar_f['TIEMPO_RESPUESTA'].mean():.1f} días")
                 
                 with col4:
-                    total_negados==len(negados_hogar_f)
-                    total_proceso==len(procesados_hogar_f)
+                    total_negados=len(negados_hogar_f)
+                    total_proceso=len(procesados_hogar_f)
                     st.metric("Total Reclamos Negados", total_negados)
                     st.metric("Total Reclamos en Proceso", total_proceso)
                     st.metric("Valor Total Reclamado en Proceso", f"${procesados_hogar_f['VALOR RECLAMADO'].sum():,.2f}")
