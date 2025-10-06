@@ -368,7 +368,12 @@ with tab2:
             # Sidebar controls
             with st.sidebar:
                 st.header("⚙️ Configuración - Hogar")
-                año_analisis_hogar = st.selectbox("Seleccionar Año", sorted(df_hogar['FECHA SINIESTRO'].dt.year.unique()), key="año_hogar")
+                
+                # Filtro de año con opción "Todos"
+                años_disponibles = sorted(df_hogar['FECHA SINIESTRO'].dt.year.unique())
+                años_opciones = ['Todos'] + años_disponibles
+                año_analisis_hogar = st.selectbox("Seleccionar Año", años_opciones, key="año_hogar")
+                
                 top_n_hogar = st.slider("Top N Causas", 3, 10, 5, key="top_hogar")
                 bins_hist_hogar = st.slider("Bins para Histograma", 10, 100, 30, key="bins_hogar")
                 
@@ -377,10 +382,16 @@ with tab2:
                 productos_hogar = ['Todas'] + sorted(df_hogar['BASE'].unique().tolist())
                 producto_sel_hogar = st.selectbox("Seleccionar Producto", productos_hogar, key="prod_hogar")
                 
+                # Aplicar filtros
                 df_hogar_filtrado = df_hogar.copy()
+                
+                # Filtrar por año (solo si no es "Todos")
+                if año_analisis_hogar != 'Todos':
+                    df_hogar_filtrado = df_hogar_filtrado[df_hogar_filtrado['FECHA SINIESTRO'].dt.year == año_analisis_hogar]
+                
+                # Filtrar por producto (solo si no es "Todas")
                 if producto_sel_hogar != 'Todas':
-                    df_hogar = df_hogar_filtrado[df_hogar_filtrado['BASE'] == producto_sel_hogar]
-
+                    df_hogar_filtrado = df_hogar_filtrado[df_hogar_filtrado['BASE'] == producto_sel_hogar]
             # Separar por estado
             liquidados_hogar = df_hogar[df_hogar['ESTADO'] == 'LIQUIDADO']
             negados_hogar = df_hogar[df_hogar['ESTADO'] == 'NEGADO']
