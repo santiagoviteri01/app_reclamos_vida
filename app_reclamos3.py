@@ -381,27 +381,22 @@ with tab2:
                 df_hogar['BASE'] = df_hogar['BASE'].fillna('No especificado').str.upper()
                 productos_hogar = ['Todas'] + sorted(df_hogar['BASE'].unique().tolist())
                 producto_sel_hogar = st.selectbox("Seleccionar Producto", productos_hogar, key="prod_hogar")
-                
-                # Aplicar filtros
-                df_hogar_filtrado = df_hogar.copy()
-                
-                # Filtrar por año solo si no es "Todos"
-                if año_analisis_hogar != 'Todos':
-                    df_hogar_filtrado = df_hogar_filtrado[df_hogar_filtrado['FECHA SINIESTRO'].dt.year == año_analisis_hogar]
-                
-                # Filtrar por producto solo si no es "Todas"
-                if producto_sel_hogar != 'Todas':
-                    df_hogar_filtrado = df_hogar_filtrado[df_hogar_filtrado['BASE'] == producto_sel_hogar]
-            # Separar por estado
-            liquidados_hogar = df_hogar_filtrado[df_hogar_filtrado['ESTADO'] == 'LIQUIDADO']
-            negados_hogar = df_hogar_filtrado[df_hogar_filtrado['ESTADO'] == 'NEGADO']
-            procesados_hogar = df_hogar_filtrado[df_hogar_filtrado['ESTADO'] == 'EN PROCESO']
             
-            # Filtrar por año
-            liquidados_hogar_f = liquidados_hogar[liquidados_hogar['FECHA SINIESTRO'].dt.year == año_analisis_hogar]
-            negados_hogar_f = negados_hogar[negados_hogar['FECHA SINIESTRO'].dt.year == año_analisis_hogar]
-            procesados_hogar_f = procesados_hogar[procesados_hogar['FECHA SINIESTRO'].dt.year == año_analisis_hogar]
-            df_hogar_año = df_hogar[df_hogar['FECHA SINIESTRO'].dt.year == año_analisis_hogar]
+            # Aplicar filtros
+            df_hogar_filtrado = df_hogar.copy()
+            
+            # Filtrar por año solo si no es "Todos"
+            if año_analisis_hogar != 'Todos':
+                df_hogar_filtrado = df_hogar_filtrado[df_hogar_filtrado['FECHA SINIESTRO'].dt.year == año_analisis_hogar]
+            
+            # Filtrar por producto solo si no es "Todas"
+            if producto_sel_hogar != 'Todas':
+                df_hogar_filtrado = df_hogar_filtrado[df_hogar_filtrado['BASE'] == producto_sel_hogar]
+            
+            # Separar por estado (usando datos ya filtrados)
+            liquidados_hogar_f = df_hogar_filtrado[df_hogar_filtrado['ESTADO'] == 'LIQUIDADO']
+            negados_hogar_f = df_hogar_filtrado[df_hogar_filtrado['ESTADO'] == 'NEGADO']
+            procesados_hogar_f = df_hogar_filtrado[df_hogar_filtrado['ESTADO'] == 'EN PROCESO']
             
             # Análisis de reclamos liquidados
             st.header("📈 Reclamos de Hogar Liquidados")
@@ -504,7 +499,7 @@ with tab2:
                     }), use_container_width=True)
                 
             else:
-                st.info("No hay reclamos liquidados para el año seleccionado")
+                st.info("No hay reclamos liquidados para los filtros seleccionados")
             
             # Reclamos negados y en proceso
             visualizar_estadisticas_pendientes(negados_hogar_f, titulo="Reclamos de Hogar Negados")
@@ -512,7 +507,7 @@ with tab2:
             
             # Datos crudos
             st.header("📄 Datos Crudos - Hogar")
-            st.dataframe(df_hogar_año, use_container_width=True)
+            st.dataframe(df_hogar_filtrado, use_container_width=True)
             
         else:
             st.warning("No se pudo cargar el archivo. Verifica el formato.")
