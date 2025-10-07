@@ -426,8 +426,10 @@ with tab2:
                 with col4:
                     total_negados=len(negados_hogar_f)
                     total_proceso=len(procesados_hogar_f)
+                    total_pendiente=len(pendientes_hogar_f)
                     st.metric("Total Reclamos Negados", total_negados)
                     st.metric("Total Reclamos en Proceso", total_proceso)
+                    st.metric("Total Reclamado Pendiente", total_pendiente)
                     st.metric("Valor Total Reclamado en Proceso", f"${procesados_hogar_f['VALOR RECLAMADO'].sum():,.2f}")
                     st.metric("Valor Total Reclamado Pendiente", f"${pendientes_hogar_f['VALOR RECLAMADO'].sum():,.2f}")
 
