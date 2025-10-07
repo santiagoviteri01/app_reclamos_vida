@@ -397,6 +397,7 @@ with tab2:
             liquidados_hogar_f = df_hogar_filtrado[df_hogar_filtrado['ESTADO'] == 'LIQUIDADO']
             negados_hogar_f = df_hogar_filtrado[df_hogar_filtrado['ESTADO'] == 'NEGADO']
             procesados_hogar_f = df_hogar_filtrado[df_hogar_filtrado['ESTADO'] == 'EN PROCESO']
+            pendientes_hogar_f = df_hogar_filtrado[df_hogar_filtrado['ESTADO'] == 'PENDIENTE']
             
             # Análisis de reclamos liquidados
             st.header("📈 Reclamos de Hogar Liquidados")
@@ -419,7 +420,6 @@ with tab2:
                 
                 with col1:
                     total_reclamos=len(df_hogar_filtrado)
-
                     st.metric("Total Reclamos", total_reclamos)
                     st.metric("Días promedio notificación de liquidados", f"{liquidados_hogar_f['TIEMPO_RESPUESTA'].mean():.1f} días")
                 
@@ -429,6 +429,9 @@ with tab2:
                     st.metric("Total Reclamos Negados", total_negados)
                     st.metric("Total Reclamos en Proceso", total_proceso)
                     st.metric("Valor Total Reclamado en Proceso", f"${procesados_hogar_f['VALOR RECLAMADO'].sum():,.2f}")
+                    st.metric("Valor Total Reclamado Pendiente", f"${pendientes_hogar_f['VALOR RECLAMADO'].sum():,.2f}")
+
+                    
                 
                 with col2:
                     st.metric("Valor Total Indemnizado", f"${liquidados_hogar_f['VALOR INDEMNIZADO'].sum():,.2f}")
