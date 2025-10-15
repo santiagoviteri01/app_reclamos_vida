@@ -179,7 +179,7 @@ with tab1:
                 # Métricas resumen
                 col1, col2 = st.columns(2)
                 liquidados_filtrados['TIEMPO_RESPUESTA'] = (liquidados_filtrados['FECHA NOTIFICACION SINIESTRO'] - liquidados_filtrados['FECHA SINIESTRO']).dt.days
-                liquidados_filtrados['TIEMPO_CIERRE'] = (liquidados_filtrados['FECHA DE CIERRE/INDEMNIZACION'] - liquidados_filtrados['FECHA SINIESTRO']).dt.days
+                liquidados_filtrados['TIEMPO_CIERRE'] = (liquidados_filtrados['FECHA DE CIERRE/INDEMNIZACION'] - liquidados_filtrados['FECHA NOTIFICACION SINIESTRO']).dt.days
                 tiempo_promedio = liquidados_filtrados['TIEMPO_RESPUESTA'].mean()
                 
                 with col1:
@@ -416,7 +416,7 @@ with tab2:
                 col1,col4,col2,col3 = st.columns(4)
                 
                 liquidados_hogar_f['TIEMPO_RESPUESTA'] = (liquidados_hogar_f['FECHA NOTIFICACION SINIESTRO'] - liquidados_hogar_f['FECHA SINIESTRO']).dt.days
-                liquidados_hogar_f['TIEMPO_CIERRE'] = (liquidados_hogar_f['FECHA DE CIERRE/INDEMNIZACION'] - liquidados_hogar_f['FECHA SINIESTRO']).dt.days
+                liquidados_hogar_f['TIEMPO_CIERRE'] = (liquidados_hogar_f['FECHA DE CIERRE/INDEMNIZACION'] - liquidados_hogar_f['FECHA NOTIFICACION SINIESTRO']).dt.days
                 
                 with col1:
                     total_reclamos=len(df_hogar_filtrado)
